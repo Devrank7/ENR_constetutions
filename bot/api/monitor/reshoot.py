@@ -1,12 +1,9 @@
 import re
 
-import speech_recognition as sr
-from aiogram.enums import ContentType
 from aiogram.types import Message
-from pydub import AudioSegment
 
 from bot.api.ai.ai import ChatGPT, generate
-from bot.api.helper.recognize import VoiceRecognize, recognize_type
+from bot.api.helper.recognize import recognize_type
 
 
 def extract_text_from_angle_brackets(text: str) -> str:

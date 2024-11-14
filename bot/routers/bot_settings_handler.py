@@ -4,7 +4,6 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 
 from bot.states.states import Constitutions
-from db.mongo.connect import get_collections
 from db.mongo.service import update_bot_settings, GetBotConstActivity, UpdateBotChatsDistributes, \
     RemoveBotChatsDistributes
 
