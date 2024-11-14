@@ -1,10 +1,7 @@
 import datetime
 
-from aiogram import Bot
 from aiogram.enums import ChatMemberStatus
 from aiogram.types import Message, ChatPermissions
-
-from bot.exception.exc import NotReplyException
 
 
 async def my_permission_has(message: Message, permissions: list[ChatMemberStatus]):

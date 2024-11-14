@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from bot.routers import start_router, rules_router, bot_settings_handler, monitor_handler, sharovar_handler, \
     gpt_mode_handler
 from sceduler.sceduler import scheduler
-from sceduler.task import DistributedTask
+from sceduler.task import DistributedTask, RefreshFineTask
 
 load_dotenv()
 os.environ["PATH"] += os.pathsep + r"F:\Downloads\ffmpeg\bin"
@@ -29,8 +29,10 @@ async def main():
     print("Start bot!")
     for router in routers:
         dp.include_router(router)
-    distribute_task = DistributedTask(bot)
+    distribute_task = DistributedTask(bot, "Weekend!!!")
+    refresh_fines_task = RefreshFineTask(bot)
     scheduler.add_job(distribute_task.execute, CronTrigger(second='30'))
+    scheduler.add_job(refresh_fines_task.execute, CronTrigger(minute='30'))
     scheduler.start()
     await dp.start_polling(bot)
 
