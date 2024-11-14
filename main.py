@@ -5,7 +5,8 @@ from aiogram import Bot, Dispatcher
 from apscheduler.triggers.cron import CronTrigger
 from dotenv import load_dotenv
 
-from bot.routers import start_router, rules_router, bot_settings_handler, reshoot_handler
+from bot.routers import start_router, rules_router, bot_settings_handler, monitor_handler, sharovar_handler, \
+    gpt_mode_handler
 from sceduler.sceduler import scheduler
 from sceduler.task import DistributedTask
 
@@ -18,7 +19,9 @@ routers = [
     start_router.router,
     rules_router.router,
     bot_settings_handler.router,
-    reshoot_handler.router,
+    sharovar_handler.router,
+    gpt_mode_handler.router,
+    monitor_handler.router,
 ]
 
 

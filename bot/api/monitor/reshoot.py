@@ -1,21 +1,12 @@
 import re
 
-from aiogram.types import Message
-
 from bot.api.ai.ai import ChatGPT, generate
-from bot.api.helper.recognize import recognize_type
-
-
-def extract_text_from_angle_brackets(text: str) -> str:
-    match = re.search(r'<(.*?)>', text)
-    if match:
-        return match.group(1)
-    return "No"
+from bot.api.helper.text import extract_text_from_angle_brackets
 
 
 def pattern_reshoot(text: str) -> bool:
     if re.search(
-            r"\bп+[еиыі]+р+[еиыі]+([сз]+)н+?[еиыі]+м\w*|\bп+[еиыі]+р+[еиыі]+([сз]+)[йъь]?[еиыіёо]+м\w*|\bп+[еиыі]+р+[еиыі]+([сз]+)+н+я\w*",
+            r"\bп+[еиыі]+р+[еиыі]+([сз]+)н+?[еиыі]+м\w*|\bп+[еиыі]+р+[еиыі]+([сз]+)[їйъь]+?[еиыіёо]+?м+\w*|\bп+[еиыі]+р+[еиыі]+([сз]+)+н+[яії]\w*",
             text,
             re.IGNORECASE):
         return True
@@ -25,10 +16,12 @@ def pattern_reshoot(text: str) -> bool:
 def two_step_reshoot(text: str) -> bool:
     response = generate(ChatGPT(
         f"""|{text}| Ответь <Да> или <Нет> на вопрос об тексте.
-             В этом тексте что то идется про пересъемки?. Ответ да или нет внутри <>"""))
+             В этом тексте есть словоа 'переснять, пересъомка' и подобные слова об съемках с префиксом 'пере'.
+             Слова эти могут быть с ошибками но если обнаружишь хотя бы одно то ответ должен быть да. Ответ предоставить внутри угловых скобок <>"""))
     print(response)
     text = extract_text_from_angle_brackets(response)
-    return text.lower() in ["да", "yes", "true", "так"]
+    print(text)
+    return text.lower() in ["да", "yes", "true", "так", "да.", "yes.", "true.", "так."]
 
 
 def reshoot_text(text: str, two_step: bool = True) -> bool:
@@ -40,14 +33,7 @@ def reshoot_text(text: str, two_step: bool = True) -> bool:
     return False
 
 
-async def reshoot(message: Message):
-    recognize_typ = recognize_type.get(message.content_type)
-    text_reshoot = message.text
-    if recognize_typ:
-        voice_recognize = recognize_typ(message)
-        text = await voice_recognize.recognize()
-        print(text)
-        text_reshoot = text
-    return reshoot_text(text_reshoot)
+async def reshoot(text: str):
+    return reshoot_text(text)
 
 

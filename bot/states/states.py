@@ -5,5 +5,5 @@ class Constitutions(StatesGroup):
     active = State()
 
 
-class Distributes(StatesGroup):
+class GPTMode(StatesGroup):
     active = State()
