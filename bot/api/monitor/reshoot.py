@@ -17,11 +17,10 @@ def two_step_reshoot(text: str) -> bool:
     response = generate(ChatGPT(
         f"""|{text}| Ответь <Да> или <Нет> на вопрос об тексте.
              В этом тексте есть словоа 'переснять, пересъомка' и подобные слова об съемках с префиксом 'пере'.
-             Слова эти могут быть с ошибками но если обнаружишь хотя бы одно то ответ должен быть да. Ответ предоставить внутри угловых скобок <>"""))
+             Слова эти могут быть с ошибками. Если ответ являестся Да то поставь в самый конец ответа такой символ '!' если нет то такой символ '#'"""))
     print(response)
-    text = extract_text_from_angle_brackets(response)
-    print(text)
-    return text.lower() in ["да", "yes", "true", "так", "да.", "yes.", "true.", "так."]
+    text = response[-1]
+    return text == '!'
 
 
 def reshoot(text: str, two_step: bool = True) -> bool:

@@ -86,7 +86,7 @@ class UpdateBotLock(BotSettings):
         if res is None:
             collections.insert_one({"_id": 0, "activity": True, "distribute_chat_ids": [], "lock": self.status})
         else:
-            collections.update({"_id": 0}, {"lock": {"activity": self.status}})
+            collections.update_one({"_id": 0}, {"$set": {"lock": self.status}})
 
 
 class GetBotLock(BotSettings):
