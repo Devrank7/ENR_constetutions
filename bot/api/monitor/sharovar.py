@@ -28,10 +28,7 @@ class RulesOfENR(ABC):
     def check(self) -> tuple[bool, str, int]:
         response = generate(ChatGPT(prompt=self._question()))
         print(response)
-        return response[-1] == self._right_symbol(), response, self.cost_fine()
-
-    def _right_symbol(self) -> str:
-        return "!"
+        return response[-1] == '!', f"{self.name()}.{response}", self.cost_fine()
 
     @abstractmethod
     def cost_fine(self) -> int:
@@ -39,28 +36,39 @@ class RulesOfENR(ABC):
 
     @abstractmethod
     def _question(self) -> str:
+        raise NotImplementedError
+
+    @abstractmethod
+    def name(self):
         raise NotImplementedError
 
 
 class Sharovarshina(RulesOfENR):
     def _question(self) -> str:
         return f"""--START_TEXT--{self.text}--END_TEXT--
-        Есть ли в этом тексте много непрофисионализма и не подготовленности человека к чему то.
+        Есть ли в этом тексте крайне много признаков не подготовленности и растеряности человека к какому то делу.
         Если ответ являестся Да то поставь в самый конец ответа такой символ '!' если нет то такой символ '#'
         """
 
     def cost_fine(self) -> int:
         return 3
 
+    def name(self):
+        return "Это же шароварщина"
+
 
 class FreeWordsOfENR(RulesOfENR):
     def _question(self) -> str:
-        return """--START_TEXT--{self.text}--END_TEXT--
-        
+        return f"""--START_TEXT--{self.text}--END_TEXT--
+        Есть ли в тексте признак серъезной диктатуры, неуважения или оскорбления человечиского мнения
+        Если ответ являестся Да то поставь в самый конец ответа такой символ '!' если нет то такой символ '#'
         """
 
     def cost_fine(self) -> int:
         return 3
+
+    def name(self):
+        return "Никакой свободы слова"
 
 
 class ReshootsOfENR(RulesOfENR):
@@ -70,10 +78,13 @@ class ReshootsOfENR(RulesOfENR):
         self.two_steps = two_steps
 
     def check(self) -> tuple[bool, str, int]:
-        return reshoot(self.text, self.two_steps), "Обнаружены намеки на пересъемки", self.cost_fine()
+        return reshoot(self.text, self.two_steps), self.name(), self.cost_fine()
 
     def cost_fine(self) -> int:
         return 5
 
     def _question(self) -> str:
         return self.text
+
+    def name(self):
+        return "Обнаружены намеки на пересъемки"

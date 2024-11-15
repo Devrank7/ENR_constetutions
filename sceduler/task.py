@@ -32,4 +32,4 @@ class RefreshFineTask(Task):
 
     async def execute(self):
         update_user_activity(ResetAllUserActivity())
-        await DistributedTask(self.bot, "Fines have been refreshed!").execute()
+        await DistributedTask(self.bot, "Все замечания за штрафи обнулены теперь можете спать спокойно🥰").execute()

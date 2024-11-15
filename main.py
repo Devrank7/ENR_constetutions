@@ -29,8 +29,13 @@ async def main():
     print("Start bot!")
     for router in routers:
         dp.include_router(router)
-    distribute_task = DistributedTask(bot, "Weekend!!!")
-    distribute_task_bad = DistributedTask(bot, "Lesson again😭")
+    distribute_task = DistributedTask(bot, "Выходные поздравляю мы это выдержали!!!😎😎😎")
+    distribute_task_bad = DistributedTask(bot, "Опять уроки НЕЕЕЕТ😭😭😭😭😭")
+    holiday_winter = DistributedTask(bot, "Зимние Каникулы УРАААААА!!!🥳🥳🥳🥳🥳🥳🥳🥳")
+    holiday_spring = DistributedTask(bot, "Весение Каникулы УРАААААА!!!🥳🥳🥳🥳🥳🥳🥳🥳")
+    holiday_summer = DistributedTask(bot,
+                                     "Это свершилось ЛЕТНИЕ Каникулы УРАААААА!!!🥳🥳🥳🥳🥳🥳🥳🥳🥳🥳🥳🥳🥳🥳🥳🥳🥳🥳🥳🥳🥳🥳🥳🥳🥳🥳🥳🥳🥳🥳")
+    holiday_autumn = DistributedTask(bot, "Осение Каникулы УРАААААА!!!🥳🥳🥳🥳🥳🥳🥳🥳")
     refresh_fines_task = RefreshFineTask(bot)
     scheduler.add_job(distribute_task.execute, CronTrigger(second='30'))
     scheduler.add_job(distribute_task_bad.execute, CronTrigger(minute='30'))

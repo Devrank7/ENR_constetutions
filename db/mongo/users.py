@@ -29,9 +29,8 @@ class GetUserActivity(UsersMonitor):
 
     def run(self) -> int:
         collections = get_collections("users")
-        res = collections.find_one({"_id": 0})  # Поиск документа с _id: 0
+        res = collections.find_one({"_id": 0})
         if res and "users" in res:
-            # Получаем значение активности пользователя по user_id или возвращаем 0, если его нет
             return res["users"].get(self.user_id, 0)
         return 0
 

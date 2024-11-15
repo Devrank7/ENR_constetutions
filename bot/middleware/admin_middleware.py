@@ -20,4 +20,6 @@ class AdminMiddleware(BaseMiddleware):
         has = await my_permission_has(event, [ChatMemberStatus.ADMINISTRATOR, ChatMemberStatus.CREATOR])
         if has:
             return await handler(event, data)
-        return await event.answer("Make me admin! If you want that I can restrict users")
+        return await event.answer(
+            "Сделай меня админом 👽 если хочешь чтобы я мог разбанивать или баннить людей на некоторое время."
+            "И самое главное!!! Это банниить людей за нарушение конституции.😈 ")

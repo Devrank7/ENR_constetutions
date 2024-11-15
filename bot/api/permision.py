@@ -33,7 +33,7 @@ class AnswerBan(Restrict):
     def __init__(self, message: Message, minutes: int = 1, forever: bool = False):
         super().__init__(message)
         if minutes <= 0 or minutes > 3600:
-            raise ValueError("Minutes must be between 0 and 3600")
+            raise ValueError("Укажите дапозон от 1 до 3600")
         self.minutes = minutes
         self.forever = forever
 
@@ -44,7 +44,7 @@ class AnswerBan(Restrict):
                 user_id=self._get_user_id(),
                 permissions=ChatPermissions(can_send_messages=False),
             )
-            await self.message.answer(f"User {self._get_first_name()} has been ban.")
+            await self.message.answer(f"Ползователь {self._get_first_name()} был за баннен на всегда.")
             return
         await self.message.bot.restrict_chat_member(
             chat_id=self.message.chat.id,
@@ -53,7 +53,7 @@ class AnswerBan(Restrict):
             until_date=datetime.datetime.now() + datetime.timedelta(minutes=self.minutes)
         )
         await self.message.answer(
-            f"User {self._get_first_name()} has been muted for {self.minutes} minutes.")
+            f"Пользователь {self._get_first_name()} был за баннен на {self.minutes} минут.")
 
     def _get_user_id(self):
         return self.message.from_user.id
@@ -66,7 +66,7 @@ class ReplyBan(AnswerBan):
 
     async def _relative_restrict(self):
         if self.message.reply_to_message is None:
-            await self.message.answer("Please reply to a user message.")
+            await self.message.answer("Закрепите сообщение пользователя которого вы хочете за баннить.👆")
             return
         return await super()._relative_restrict()
 
@@ -84,7 +84,7 @@ class AnswerUnban(Restrict):
             user_id=self._get_user_id(),
             permissions=ChatPermissions(can_send_messages=True),
         )
-        await self.message.answer(f"Unmuted user {self._get_first_name()}")
+        await self.message.answer(f"Разбаннен {self._get_first_name()}")
 
     def _get_user_id(self):
         return self.message.from_user.id
@@ -96,7 +96,7 @@ class AnswerUnban(Restrict):
 class ReplyUnban(AnswerUnban):
     async def _relative_restrict(self):
         if self.message.reply_to_message is None:
-            await self.message.answer("Please reply to a user message.")
+            await self.message.answer("Закрепите сообщение пользователя которого вы хочете раз баннить.👆")
             return
         await super()._relative_restrict()
 
@@ -105,47 +105,3 @@ class ReplyUnban(AnswerUnban):
 
     def _get_first_name(self):
         return self.message.reply_to_message.from_user.first_name
-
-
-async def ban(message: Message, minutes: int = 1, forever: bool = False):
-    try:
-        if forever:
-            await message.bot.restrict_chat_member(
-                chat_id=message.chat.id,
-                user_id=message.reply_to_message.from_user.id,
-                permissions=ChatPermissions(can_send_messages=False),
-            )
-            await message.answer(f"User {message.reply_to_message.from_user.first_name} has been ban.")
-            return
-        await message.bot.restrict_chat_member(
-            chat_id=message.chat.id,
-            user_id=message.reply_to_message.from_user.id,
-            permissions=ChatPermissions(can_send_messages=False),
-            until_date=datetime.datetime.now() + datetime.timedelta(minutes=minutes)
-        )
-        await message.answer(
-            f"User {message.reply_to_message.from_user.first_name} has been muted for {minutes} minutes.")
-    except Exception as e:
-        await message.answer(str(e))
-
-
-async def ban_user(message: Message, minutes: int = 1, forever: bool = False):
-    try:
-        if forever:
-            await message.bot.restrict_chat_member(
-                chat_id=message.chat.id,
-                user_id=message.reply_to_message.from_user.id,
-                permissions=ChatPermissions(can_send_messages=False),
-            )
-            await message.answer(f"User {message.reply_to_message.from_user.first_name} has been ban.")
-            return
-        await message.bot.restrict_chat_member(
-            chat_id=message.chat.id,
-            user_id=message.reply_to_message.from_user.id,
-            permissions=ChatPermissions(can_send_messages=False),
-            until_date=datetime.datetime.now() + datetime.timedelta(minutes=minutes)
-        )
-        await message.answer(
-            f"User {message.reply_to_message.from_user.first_name} has been muted for {minutes} minutes.")
-    except Exception as e:
-        await message.answer(str(e))

@@ -17,7 +17,7 @@ class UpdateBotConstActivity(BotSettings):
         collections = get_collections()
         res = collections.find_one({"_id": 0})
         if res is None:
-            collections.insert_one({"_id": 0, "activity": self.activity})
+            collections.insert_one({"_id": 0, "activity": self.activity, "distribute_chat_ids": [], "lock": False})
         else:
             collections.update({"_id": 0}, {"$set": {"activity": self.activity}})
 
@@ -28,7 +28,7 @@ class GetBotConstActivity(BotSettings):
         collections = get_collections()
         res = collections.find_one({"_id": 0})
         if res is None:
-            collections.insert_one({"_id": 0, "activity": True, "distribute_chat_ids": []})
+            collections.insert_one({"_id": 0, "activity": True, "distribute_chat_ids": [], "lock": False})
             return True
         return res["activity"]
 
@@ -41,7 +41,7 @@ class UpdateBotChatsDistributes(BotSettings):
         collections = get_collections()
         res = collections.find_one({"_id": 0})
         if res is None:
-            collections.insert_one({"_id": 0, "activity": True, "distribute_chat_ids": [self.chat_id]})
+            collections.insert_one({"_id": 0, "activity": True, "distribute_chat_ids": [self.chat_id], "lock": False})
         else:
             collections.update_one(
                 {"_id": 0},  # Условие поиска записи (например, _id: 0)
@@ -74,6 +74,30 @@ class GetBotChatsDistributes(BotSettings):
         if res is None:
             return []
         return res.get("distribute_chat_ids", [])
+
+
+class UpdateBotLock(BotSettings):
+    def __init__(self, status: bool):
+        self.status = status
+
+    def run(self) -> None:
+        collections = get_collections()
+        res = collections.find_one({"_id": 0})
+        if res is None:
+            collections.insert_one({"_id": 0, "activity": True, "distribute_chat_ids": [], "lock": self.status})
+        else:
+            collections.update({"_id": 0}, {"lock": {"activity": self.status}})
+
+
+class GetBotLock(BotSettings):
+
+    def run(self) -> bool:
+        collections = get_collections()
+        res = collections.find_one({"_id": 0})
+        if res is None:
+            collections.insert_one({"_id": 0, "activity": True, "distribute_chat_ids": [], "lock": False})
+            return False
+        return res.get("lock")
 
 
 def update_bot_settings(bot_settings: BotSettings):

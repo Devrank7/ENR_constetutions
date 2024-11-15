@@ -14,22 +14,23 @@ router = Router()
 @router.message(Command("gpt"))
 async def gpt(message: Message):
     markup = as_keyboard_markup(GPTModelsKeyboardMarkup())
-    await message.answer("Choose role: ", reply_markup=markup)
+    await message.answer("Выберете модель гпт (генеративного предобученого трансформера): ", reply_markup=markup)
 
 
 @router.callback_query(F.data.startswith("gpt_"))
 async def gpt_callback(query: CallbackQuery, state: FSMContext):
     model = query.data.split("_")[1]
     await state.update_data(model=model)
-    await query.answer(f"GPT mode activate. Model {model} activate!")
+    await query.answer(f"ГПТ мод активирован👾 Задавайте вопросы. Моделька {model} активированна!")
     await state.set_state(GPTMode.active)
-    await query.message.edit_text(f"GPT mode activate. Model {model} activate! Leave mode type Q")
+    await query.message.edit_text(
+        f"ГПТ мод активирован👾 Задавайте вопросы. Моделька {model} активированна! Чтобы выйти из мода введи 'Q'")
 
 
 @router.message(GPTMode.active)
 async def gpt_mode(message: Message, state: FSMContext):
     if message.text.lower() == "q":
-        await message.answer("Quitting...")
+        await message.answer("Выход из гпт режима...")
         await state.clear()
         return
     data = await state.get_data()
