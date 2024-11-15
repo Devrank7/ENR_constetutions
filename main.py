@@ -30,9 +30,11 @@ async def main():
     for router in routers:
         dp.include_router(router)
     distribute_task = DistributedTask(bot, "Weekend!!!")
+    distribute_task_bad = DistributedTask(bot, "Lesson again😭")
     refresh_fines_task = RefreshFineTask(bot)
     scheduler.add_job(distribute_task.execute, CronTrigger(second='30'))
-    scheduler.add_job(refresh_fines_task.execute, CronTrigger(minute='30'))
+    scheduler.add_job(distribute_task_bad.execute, CronTrigger(minute='30'))
+    scheduler.add_job(refresh_fines_task.execute, CronTrigger(second='45'))
     scheduler.start()
     await dp.start_polling(bot)
 

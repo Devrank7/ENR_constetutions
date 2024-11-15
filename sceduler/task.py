@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 from aiogram import Bot
 
-from db.mongo.service import update_bot_settings, GetBotChatsDistributes
+from db.mongo.bot_settings import update_bot_settings, GetBotChatsDistributes
 
 from db.mongo.users import update_user_activity, ResetAllUserActivity
 

@@ -24,16 +24,12 @@ def two_step_reshoot(text: str) -> bool:
     return text.lower() in ["да", "yes", "true", "так", "да.", "yes.", "true.", "так."]
 
 
-def reshoot_text(text: str, two_step: bool = True) -> bool:
+def reshoot(text: str, two_step: bool = True) -> bool:
     valid = pattern_reshoot(text)
     if valid:
         return valid
     if two_step:
         return two_step_reshoot(text)
     return False
-
-
-async def reshoot(text: str):
-    return reshoot_text(text)
 
 

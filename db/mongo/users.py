@@ -28,7 +28,7 @@ class GetUserActivity(UsersMonitor):
         self.user_id = user_id
 
     def run(self) -> int:
-        collections = get_collections()
+        collections = get_collections("users")
         res = collections.find_one({"_id": 0})  # Поиск документа с _id: 0
         if res and "users" in res:
             # Получаем значение активности пользователя по user_id или возвращаем 0, если его нет
@@ -38,12 +38,19 @@ class GetUserActivity(UsersMonitor):
 
 class ResetAllUserActivity(UsersMonitor):
     def run(self):
-        collections = get_collections()
-        collections.update_one(
-            {"_id": 0},
-            {"$set": {"users": {key: 0 for key in collections.find_one({"_id": 0}).get("users", {})}}},
-            upsert=True
-        )
+        collections = get_collections("users")
+        res = collections.find_one({"_id": 0})
+        if res and "users" in res:
+            collections.update_one(
+                {"_id": 0},
+                {"$set": {"users": {key: 0 for key in res["users"]}}}
+            )
+        else:
+            collections.update_one(
+                {"_id": 0},
+                {"$set": {"users": {}}},
+                upsert=True
+            )
 
 
 def update_user_activity(user_monitor: UsersMonitor):

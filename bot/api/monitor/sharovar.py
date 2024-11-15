@@ -1,13 +1,79 @@
+from abc import ABC, abstractmethod
+
 from bot.api.ai.ai import ChatGPT, generate
-from bot.api.helper.text import extract_text_from_angle_brackets
+from bot.api.monitor.reshoot import reshoot
 
-
-def sharovarshina(text: str):
-    response = generate(ChatGPT(prompt=
-                                f"""
+prompt_sharovarshina = lambda text: f"""
                                 --START_TEXT--{text}--END_TEXT--
-                                Есть ли в этом тексте нотки непрофисионализма и не подготовленности.
-                                Ответ предоставить внутри угловых скобок <>
-                                """))
-    text = extract_text_from_angle_brackets(response)
-    return text.lower() in ["да", "yes", "true", "так", "да.", "yes.", "true.", "так."]
+                                Есть ли в этом тексте много непрофисионализма и не подготовленности человека к чему то.
+                                Если ответ являестся Да то поставь в самый конец ответа такой символ '!' если нет то такой символ '#'
+                                """
+
+
+def sharovarshina(text: str) -> tuple[bool, str]:
+    response = generate(ChatGPT(prompt=prompt_sharovarshina(text)))
+    print(response)
+    return response[-1] == "!", response
+
+
+def city_bourgeois():
+    pass
+
+
+class RulesOfENR(ABC):
+
+    def __init__(self, text: str):
+        self.text = text
+
+    def check(self) -> tuple[bool, str, int]:
+        response = generate(ChatGPT(prompt=self._question()))
+        print(response)
+        return response[-1] == self._right_symbol(), response, self.cost_fine()
+
+    def _right_symbol(self) -> str:
+        return "!"
+
+    @abstractmethod
+    def cost_fine(self) -> int:
+        raise NotImplementedError
+
+    @abstractmethod
+    def _question(self) -> str:
+        raise NotImplementedError
+
+
+class Sharovarshina(RulesOfENR):
+    def _question(self) -> str:
+        return f"""--START_TEXT--{self.text}--END_TEXT--
+        Есть ли в этом тексте много непрофисионализма и не подготовленности человека к чему то.
+        Если ответ являестся Да то поставь в самый конец ответа такой символ '!' если нет то такой символ '#'
+        """
+
+    def cost_fine(self) -> int:
+        return 3
+
+
+class FreeWordsOfENR(RulesOfENR):
+    def _question(self) -> str:
+        return """--START_TEXT--{self.text}--END_TEXT--
+        
+        """
+
+    def cost_fine(self) -> int:
+        return 3
+
+
+class ReshootsOfENR(RulesOfENR):
+
+    def __init__(self, text: str, two_steps: bool = False):
+        super().__init__(text)
+        self.two_steps = two_steps
+
+    def check(self) -> tuple[bool, str, int]:
+        return reshoot(self.text, self.two_steps), "Обнаружены намеки на пересъемки", self.cost_fine()
+
+    def cost_fine(self) -> int:
+        return 5
+
+    def _question(self) -> str:
+        return self.text
