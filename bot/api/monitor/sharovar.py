@@ -3,30 +3,14 @@ from abc import ABC, abstractmethod
 from bot.api.ai.ai import ChatGPT, generate
 from bot.api.monitor.reshoot import reshoot
 
-prompt_sharovarshina = lambda text: f"""
-                                --START_TEXT--{text}--END_TEXT--
-                                Есть ли в этом тексте много непрофисионализма и не подготовленности человека к чему то.
-                                Если ответ являестся Да то поставь в самый конец ответа такой символ '!' если нет то такой символ '#'
-                                """
-
-
-def sharovarshina(text: str) -> tuple[bool, str]:
-    response = generate(ChatGPT(prompt=prompt_sharovarshina(text)))
-    print(response)
-    return response[-1] == "!", response
-
-
-def city_bourgeois():
-    pass
-
 
 class RulesOfENR(ABC):
 
     def __init__(self, text: str):
         self.text = text
 
-    def check(self) -> tuple[bool, str, int]:
-        response = generate(ChatGPT(prompt=self._question()))
+    async def check(self) -> tuple[bool, str, int]:
+        response = await generate(ChatGPT(prompt=self._question()))
         print(response)
         return response[-1] == '!', f"{self.name()}.{response}", self.cost_fine()
 
@@ -46,29 +30,29 @@ class RulesOfENR(ABC):
 class Sharovarshina(RulesOfENR):
     def _question(self) -> str:
         return f"""--START_TEXT--{self.text}--END_TEXT--
-        Есть ли в этом тексте крайне много признаков не подготовленности и растеряности человека к какому то делу.
+        Говорится ли в тексте ясно и открыто, что кто-то что-то забыл или забыл к чему-то подготовиться?
         Если ответ являестся Да то последний символ твоего ответа должен быть '!' если нет то такой символ '#'
         """
 
     def cost_fine(self) -> int:
-        return 3
+        return 2
 
     def name(self):
-        return "Это же шароварщина"
+        return "Статья 2. Явный признак шароварщины👁️ это же непрофесионализм и неподготовленость."
 
 
 class FreeWordsOfENR(RulesOfENR):
     def _question(self) -> str:
         return f"""--START_TEXT--{self.text}--END_TEXT--
-        Есть ли в тексте признак серъезной диктатуры, неуважения или оскорбления человечиского мнения
-        Если ответ являестся Да то последний символ твоего ответа должен быть '!' если нет то такой символ '#'
+        Содержит ли текст жестокое оскорбление человеческого мнения?
+        Если ответ являестся Да то самый последний символ твоего ответа должен быть '!' если нет то такой символ '#'
         """
 
     def cost_fine(self) -> int:
         return 3
 
     def name(self):
-        return "Никакой свободы слова"
+        return "Статья 3. Нарушение свободы слова!!! Неуважение человечиского мнения😡"
 
 
 class ReshootsOfENR(RulesOfENR):
@@ -77,14 +61,14 @@ class ReshootsOfENR(RulesOfENR):
         super().__init__(text)
         self.two_steps = two_steps
 
-    def check(self) -> tuple[bool, str, int]:
-        return reshoot(self.text, self.two_steps), self.name(), self.cost_fine()
+    async def check(self) -> tuple[bool, str, int]:
+        return await reshoot(self.text, self.two_steps, self._question()), self.name(), self.cost_fine()
 
     def cost_fine(self) -> int:
         return 5
 
     def _question(self) -> str:
-        return self.text
+        return "В этом тексте есть словоа 'переснять, пересъомка' и подобные слова об съемках с префиксом 'пере'"
 
     def name(self):
-        return "Обнаружены намеки на пересъемки"
+        return "СТАТЬЯ 1. Явно видно намек на ПЕРЕСЪОМКИ📸."

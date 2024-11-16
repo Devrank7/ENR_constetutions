@@ -1,29 +1,30 @@
 from aiogram import Router, F
 from aiogram.filters import Command
-from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery, ReplyKeyboardMarkup, \
-    KeyboardButton
+    KeyboardButton, ReplyKeyboardRemove
 
-from bot.states.states import Constitutions
 from db.mongo.bot_settings import update_bot_settings, GetBotConstActivity, UpdateBotChatsDistributes, \
-    RemoveBotChatsDistributes, GetBotLock, UpdateBotLock
+    RemoveBotChatsDistributes, GetBotLock, UpdateBotLock, UpdateBotConstActivity
 
 router = Router()
 
 
 @router.message(Command("set"))
-async def reshoot_handler(message: Message, state: FSMContext):
-    await state.set_state(Constitutions.active)
-    await message.answer("Введите для активации или деактивации конституции Y/n")
+async def reshoot_handler(message: Message):
+    action = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="Yes", callback_data="a_y"),
+         InlineKeyboardButton(text="No", callback_data="a_n")],
+    ])
+    await message.answer("Введите для активации или деактивации конституции: ", reply_markup=action)
 
 
-@router.message(Constitutions.active)
-async def reshoot_handler(message: Message, state: FSMContext):
-    active = message.text.lower() == 'y'
-    data = await state.update_data(active=active)
-    update_bot_settings(data['active'])
-    await state.clear()
-    await message.answer(f"Статус активности конституции изменен на {"Включеный" if active else "Выключеный"}")
+@router.callback_query(F.data.startswith("a_"))
+async def reshoot_handler(query: CallbackQuery):
+    active = query.data.split("_")[1] == 'y'
+    update_bot_settings(UpdateBotConstActivity(active))
+    status = {"Включеный" if active else "Выключеный"}
+    await query.answer(f"Статус активности конституции изменен на {status}", show_alert=True)
+    await query.message.edit_text(f"Статус активности конституции изменен на {status}")
 
 
 @router.message(Command("get"))
@@ -74,10 +75,11 @@ async def set_lock(message: Message):
 @router.message(F.text == "Сделать так чтобы я мог баннить за нарушение конституции")
 async def set_lo(message: Message):
     update_bot_settings(UpdateBotLock(status=False))
-    await message.answer('Теперь я могу баннить за нарушение конституции🤠')
+    await message.answer('Теперь я могу баннить за нарушение конституции🤠', reply_markup=ReplyKeyboardRemove())
 
 
 @router.message(F.text == "Сделать так чтобы я не мог баннить за нарушение конституции, а просто ругал")
 async def set_loc(message: Message):
     update_bot_settings(UpdateBotLock(status=True))
-    await message.answer('Теперь я не могу баннить за нарушение конституции только критиковать😕')
+    await message.answer('Теперь я не могу баннить за нарушение конституции только критиковать😕',
+                         reply_markup=ReplyKeyboardRemove())

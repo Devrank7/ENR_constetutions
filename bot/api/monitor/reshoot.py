@@ -13,22 +13,22 @@ def pattern_reshoot(text: str) -> bool:
     return False
 
 
-def two_step_reshoot(text: str) -> bool:
-    response = generate(ChatGPT(
+async def two_step_reshoot(text: str, question: str) -> bool:
+    response = await generate(ChatGPT(
         f"""|{text}| Ответь <Да> или <Нет> на вопрос об тексте.
-             В этом тексте есть словоа 'переснять, пересъомка' и подобные слова об съемках с префиксом 'пере'.
+             {question}.
              Слова эти могут быть с ошибками. Если ответ являестся Да то поставь в самый конец ответа такой символ '!' если нет то такой символ '#'"""))
     print(response)
     text = response[-1]
     return text == '!'
 
 
-def reshoot(text: str, two_step: bool = True) -> bool:
+async def reshoot(text: str, two_step: bool = True, question: str = "") -> bool:
     valid = pattern_reshoot(text)
     if valid:
         return valid
     if two_step:
-        return two_step_reshoot(text)
+        return await two_step_reshoot(text, question)
     return False
 
 

@@ -19,7 +19,7 @@ class UpdateBotConstActivity(BotSettings):
         if res is None:
             collections.insert_one({"_id": 0, "activity": self.activity, "distribute_chat_ids": [], "lock": False})
         else:
-            collections.update({"_id": 0}, {"$set": {"activity": self.activity}})
+            collections.update_one({"_id": 0}, {"$set": {"activity": self.activity}})
 
 
 class GetBotConstActivity(BotSettings):

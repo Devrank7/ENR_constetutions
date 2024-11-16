@@ -1,4 +1,7 @@
+import asyncio
+
 from aiogram import Router, F
+from aiogram.enums import ChatAction
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery
@@ -35,6 +38,18 @@ async def gpt_mode(message: Message, state: FSMContext):
         return
     data = await state.get_data()
     model = GPTModels(data["model"])
-    response = generate(ChatGPT(prompt=message.text, model=model))
+
+    async def send_typing():
+        while not stop_typing.is_set():
+            await message.bot.send_chat_action(message.chat.id, ChatAction.TYPING)
+            await asyncio.sleep(5)
+
+    stop_typing = asyncio.Event()
+    typing_task = asyncio.create_task(send_typing())
+    try:
+        response = await generate(ChatGPT(prompt=message.text, model=model))
+    finally:
+        stop_typing.set()
+        await typing_task
     await message.answer(response)
     await state.set_state(GPTMode.active)

@@ -19,7 +19,7 @@ async def issue_fine_for_user_if_has(fine: Fine, text: str):
     lock = update_bot_settings(GetBotLock())
     try:
         for issue in issues:
-            is_fine, reason, cost = issue(text).check()
+            is_fine, reason, cost = await issue(text).check()
             if is_fine:
                 raise ENRConstitutionsException(build_issue(reason), cost)
     except ENRConstitutionsException as e:
