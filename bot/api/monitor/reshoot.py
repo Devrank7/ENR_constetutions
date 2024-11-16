@@ -1,7 +1,7 @@
 import re
 
 from bot.api.ai.ai import ChatGPT, generate
-from bot.api.helper.text import extract_text_from_angle_brackets
+from bot.api.helper.text import is_symbol
 
 
 def pattern_reshoot(text: str) -> bool:
@@ -19,8 +19,7 @@ async def two_step_reshoot(text: str, question: str) -> bool:
              {question}.
              Слова эти могут быть с ошибками. Если ответ являестся Да то поставь в самый конец ответа такой символ '!' если нет то такой символ '#'"""))
     print(response)
-    text = response[-1]
-    return text == '!'
+    return is_symbol(response)
 
 
 async def reshoot(text: str, two_step: bool = True, question: str = "") -> bool:
@@ -30,5 +29,3 @@ async def reshoot(text: str, two_step: bool = True, question: str = "") -> bool:
     if two_step:
         return await two_step_reshoot(text, question)
     return False
-
-

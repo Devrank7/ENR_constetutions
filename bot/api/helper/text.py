@@ -21,3 +21,10 @@ def extract_text_from_angle_brackets(text: str) -> str:
     if match:
         return match.group(1)
     return "No"
+
+
+def is_symbol(text: str, symbol: str = '!', max_iter: int = 3) -> bool:
+    for char in text[::-1][:max_iter]:
+        if char == symbol:
+            return True
+    return False

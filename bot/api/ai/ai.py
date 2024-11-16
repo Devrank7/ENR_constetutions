@@ -15,6 +15,8 @@ class AI(ABC):
 
 
 class ChatGPT(AI):
+    MAX_ATTEMPTS = 10
+
     def __init__(self, prompt, model: GPTModels = GPTModels.GPT4O_MINI):
         self.prompt = prompt
         self.model = model
@@ -23,7 +25,6 @@ class ChatGPT(AI):
         print("Begin")
 
         def get_response_sync():
-            """Синхронная функция для получения ответа."""
             client = Client()
             response = client.chat.completions.create(
                 model=self.model.value,
@@ -34,20 +35,20 @@ class ChatGPT(AI):
             )
             return response.choices[0].message.content
 
-        max_attempts = 7
+        max_attempts = self.MAX_ATTEMPTS
         attempt = 0
         loop = asyncio.get_running_loop()
 
         while attempt < max_attempts:
             try:
-                # Выполняем синхронную функцию в отдельном потоке с ограничением времени
-                response = await asyncio.wait_for(
+                responses = await asyncio.wait_for(
                     loop.run_in_executor(ThreadPoolExecutor(), get_response_sync),
-                    timeout=10
+                    timeout=8
                 )
-                if response[-1] == '4':
+                print(responses)
+                if responses == 'Request ended with status code 404':
                     raise Exception("404")
-                return response
+                return responses
             except asyncio.TimeoutError:
                 print(f"Attempt {attempt + 1} timed out. Retrying...")
             except Exception as e:
