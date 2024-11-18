@@ -82,7 +82,20 @@ class AnswerUnban(Restrict):
         await self.message.bot.restrict_chat_member(
             chat_id=self.message.chat.id,
             user_id=self._get_user_id(),
-            permissions=ChatPermissions(can_send_messages=True),
+            permissions=ChatPermissions(
+                can_send_messages=True,
+                can_send_photos=True,
+                can_send_voice=True,
+                can_send_polls=True,
+                can_send_documents=True,
+                can_send_audios=True,
+                can_send_videos=True,
+                can_invite_users=True,
+                can_pin_messages=True,
+                can_send_other_messages=True,
+                can_send_video_notes=True,
+                can_send_voice_notes=True
+            ),
         )
         await self.message.answer(f"Разбаннен {self._get_first_name()}")
 
