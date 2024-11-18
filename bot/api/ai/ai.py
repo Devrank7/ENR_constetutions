@@ -16,7 +16,7 @@ class AI(ABC):
 
 class ChatGPT(AI):
 
-    def __init__(self, prompt, model: AIModels = GPTModels.GPT4O_MINI):
+    def __init__(self, prompt, model: AIModels = GPTModels.GPT4O):
         self.prompt = prompt
         self.model = model
 
