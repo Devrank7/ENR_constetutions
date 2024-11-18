@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Full Screen Image</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+        }
+
+        /* Фон в виде изображения */
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://wallpapershome.com/images/pages/pic_h/5520.jpg'); /* Укажите ссылку на ваше изображение */
+            background-size: cover;
+            background-position: center;
+            z-index: -1;
+        }
+
+        /* Стиль текста */
+        .center-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: white;
+            font-size: 3em;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border: 5px solid rgba(255, 255, 255, 0.6);
+            border-radius: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+    </style>
+</head>
+<body>
+<div class="background"></div>
+<div class="center-text">Добро пожаловать в Ебеньвское королевство!!!</div>
+</body>
+</html>

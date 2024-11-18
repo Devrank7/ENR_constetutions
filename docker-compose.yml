@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  fastapi:
+    build:
+      context: .
+      dockerfile: Dockerfile.fastapi
+    container_name: fastapi_app1
+    ports:
+      - "8000:8000"
+    networks:
+      - app_network
+
+  aiogram:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: aiogram_bot
+    networks:
+      - app_network
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx_proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge
