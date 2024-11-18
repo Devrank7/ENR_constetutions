@@ -5,7 +5,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 from g4f.client import Client
 
-from bot.api.ai.models import GPTModels
+from bot.api.ai.models import GPTModels, AIModels, FluxModels
 
 
 class AI(ABC):
@@ -15,35 +15,35 @@ class AI(ABC):
 
 
 class ChatGPT(AI):
-    MAX_ATTEMPTS = 10
 
-    def __init__(self, prompt, model: GPTModels = GPTModels.GPT4O_MINI):
+    def __init__(self, prompt, model: AIModels = GPTModels.GPT4O_MINI):
         self.prompt = prompt
         self.model = model
 
+    def get_max_attempts(self):
+        return 8
+
+    def get_response_sync(self):
+        client = Client()
+        response = client.chat.completions.create(
+            model=self.model.value,
+            messages=[{
+                "role": "user",
+                "content": self.prompt,
+            }]
+        )
+        return response.choices[0].message.content
+
     async def generate(self):
         print("Begin")
-
-        def get_response_sync():
-            client = Client()
-            response = client.chat.completions.create(
-                model=self.model.value,
-                messages=[{
-                    "role": "user",
-                    "content": self.prompt,
-                }]
-            )
-            return response.choices[0].message.content
-
-        max_attempts = self.MAX_ATTEMPTS
         attempt = 0
         loop = asyncio.get_running_loop()
 
-        while attempt < max_attempts:
+        while attempt < 10:
             try:
                 responses = await asyncio.wait_for(
-                    loop.run_in_executor(ThreadPoolExecutor(), get_response_sync),
-                    timeout=8
+                    loop.run_in_executor(ThreadPoolExecutor(), self.get_response_sync),
+                    timeout=self.get_max_attempts()
                 )
                 print(responses)
                 if responses == 'Request ended with status code 404':
@@ -57,6 +57,25 @@ class ChatGPT(AI):
             attempt += 1
 
         raise TimeoutError("Failed to get a response within the allowed attempts.")
+
+
+class FluxGPT(ChatGPT):
+
+    def __init__(self, prompt, models: FluxModels = FluxModels.FLUX):
+        super().__init__(prompt, models)
+
+    def get_response_sync(self):
+        client = Client()
+        response = client.images.generate(
+            model=self.model.value,
+            prompt=self.prompt,
+        )
+        url = response.data[0].url
+        print(url)
+        return url
+
+    def get_max_attempts(self):
+        return 60
 
 
 async def generate(ai: AI):

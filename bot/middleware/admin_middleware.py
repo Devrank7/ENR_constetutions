@@ -17,6 +17,7 @@ class AdminMiddleware(BaseMiddleware):
             event: Message,
             data: Dict[str, Any]
     ) -> Any:
+        print('HERE')
         has = await my_permission_has(event, [ChatMemberStatus.ADMINISTRATOR, ChatMemberStatus.CREATOR])
         if has:
             return await handler(event, data)

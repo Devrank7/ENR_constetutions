@@ -1,8 +1,10 @@
 from aiogram import Router, F
+from aiogram.enums import ChatMemberStatus
 from aiogram.filters import Command
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery, ReplyKeyboardMarkup, \
     KeyboardButton, ReplyKeyboardRemove
 
+from bot.api.permision import my_permission_has
 from db.mongo.bot_settings import update_bot_settings, GetBotConstActivity, UpdateBotChatsDistributes, \
     RemoveBotChatsDistributes, GetBotLock, UpdateBotLock, UpdateBotConstActivity
 
@@ -21,6 +23,11 @@ async def reshoot_handler(message: Message):
 @router.callback_query(F.data.startswith("a_"))
 async def reshoot_handler(query: CallbackQuery):
     active = query.data.split("_")[1] == 'y'
+    if active:
+        has = await my_permission_has(query.message, [ChatMemberStatus.ADMINISTRATOR, ChatMemberStatus.CREATOR])
+        if not has:
+            await query.message.edit_text("Простите но даайте мне админку перед включение конституции!!!")
+            return
     update_bot_settings(UpdateBotConstActivity(active))
     status = {"Включеный" if active else "Выключеный"}
     await query.answer(f"Статус активности конституции изменен на {status}", show_alert=True)
@@ -58,8 +65,10 @@ async def d_callback(query: CallbackQuery):
 @router.message(Command("get_lock"))
 async def get_lock(message: Message):
     lock = update_bot_settings(GetBotLock())
-    text = "Я не могу баннить только ругать🤬 пользователя который нарушил конституцию ЕНР" if lock else \
-        "Я могу баннить на некоторое время. И буду баннить за нарушения конституции📣"
+    has = await my_permission_has(message, [ChatMemberStatus.ADMINISTRATOR, ChatMemberStatus.CREATOR])
+    warn = '' if has else ' Только дайте админку'
+    text = f"Я не буду баннить только ругать🤬 пользователя который нарушил конституцию ЕНР {warn}" if lock else \
+        f"Я буду баннить на некоторое время. И буду баннить за нарушения конституции📣 {warn}"
     await message.answer(text)
 
 
@@ -74,12 +83,16 @@ async def set_lock(message: Message):
 
 @router.message(F.text == "Сделать так чтобы я мог баннить за нарушение конституции")
 async def set_lo(message: Message):
+    has = await my_permission_has(message, [ChatMemberStatus.ADMINISTRATOR, ChatMemberStatus.CREATOR])
     update_bot_settings(UpdateBotLock(status=False))
-    await message.answer('Теперь я могу баннить за нарушение конституции🤠', reply_markup=ReplyKeyboardRemove())
+    warn = '' if has else ' Только дайте админку!!!'
+    await message.answer(f'Теперь я буду баннить за нарушение конституции🤠 {warn}', reply_markup=ReplyKeyboardRemove())
 
 
 @router.message(F.text == "Сделать так чтобы я не мог баннить за нарушение конституции, а просто ругал")
 async def set_loc(message: Message):
     update_bot_settings(UpdateBotLock(status=True))
-    await message.answer('Теперь я не могу баннить за нарушение конституции только критиковать😕',
+    has = await my_permission_has(message, [ChatMemberStatus.ADMINISTRATOR, ChatMemberStatus.CREATOR])
+    warn = '' if has else ' Только дайте админку!!!'
+    await message.answer(f'Теперь я не могу баннить за нарушение конституции только критиковать😕 {warn}',
                          reply_markup=ReplyKeyboardRemove())
