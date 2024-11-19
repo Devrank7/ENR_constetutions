@@ -37,7 +37,11 @@ class UpdateMessage(MyChange):
                                       [ChatMemberStatus.ADMINISTRATOR, ChatMemberStatus.CREATOR])
         if has and self.message.text:
             text = self.message.text
+            reply = self.message.reply_to_message
             await self._delete_message()
-            await self.message.bot.send_message(self.message.chat.id, text)
+            if reply:
+                await self.message.bot.send_message(self.message.chat.id, text, reply_to_message_id=reply.message_id)
+            else:
+                await self.message.bot.send_message(self.message.chat.id, text)
             return True
         return False
