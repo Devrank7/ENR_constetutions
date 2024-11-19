@@ -17,7 +17,8 @@ class UpdateBotConstActivity(BotSettings):
         collections = get_collections()
         res = collections.find_one({"_id": 0})
         if res is None:
-            collections.insert_one({"_id": 0, "activity": self.activity, "distribute_chat_ids": [], "lock": False})
+            collections.insert_one({"_id": 0, "activity": self.activity, "distribute_chat_ids": [], "lock": False,
+                                    "changes_users_ids": []})
         else:
             collections.update_one({"_id": 0}, {"$set": {"activity": self.activity}})
 
@@ -28,7 +29,8 @@ class GetBotConstActivity(BotSettings):
         collections = get_collections()
         res = collections.find_one({"_id": 0})
         if res is None:
-            collections.insert_one({"_id": 0, "activity": True, "distribute_chat_ids": [], "lock": False})
+            collections.insert_one({"_id": 0, "activity": True, "distribute_chat_ids": [], "lock": False,
+                                    "changes_users_ids": []})
             return True
         return res["activity"]
 
@@ -41,7 +43,8 @@ class UpdateBotChatsDistributes(BotSettings):
         collections = get_collections()
         res = collections.find_one({"_id": 0})
         if res is None:
-            collections.insert_one({"_id": 0, "activity": True, "distribute_chat_ids": [self.chat_id], "lock": False})
+            collections.insert_one({"_id": 0, "activity": True, "distribute_chat_ids": [self.chat_id], "lock": False,
+                                    "changes_users_ids": []})
         else:
             collections.update_one(
                 {"_id": 0},  # Условие поиска записи (например, _id: 0)
@@ -84,7 +87,8 @@ class UpdateBotLock(BotSettings):
         collections = get_collections()
         res = collections.find_one({"_id": 0})
         if res is None:
-            collections.insert_one({"_id": 0, "activity": True, "distribute_chat_ids": [], "lock": self.status})
+            collections.insert_one({"_id": 0, "activity": True, "distribute_chat_ids": [], "lock": self.status,
+                                    "changes_users_ids": []})
         else:
             collections.update_one({"_id": 0}, {"$set": {"lock": self.status}})
 
@@ -95,9 +99,55 @@ class GetBotLock(BotSettings):
         collections = get_collections()
         res = collections.find_one({"_id": 0})
         if res is None:
-            collections.insert_one({"_id": 0, "activity": True, "distribute_chat_ids": [], "lock": False})
+            collections.insert_one({"_id": 0, "activity": True, "distribute_chat_ids": [], "lock": False,
+                                    "changes_users_ids": []})
             return False
         return res.get("lock")
+
+
+class ChangesUsers(BotSettings):
+
+    def run(self):
+        collections = get_collections()
+        res = collections.find_one({"_id": 0})
+        if res is None:
+            return []
+        return res.get("changes_users_ids", [])
+
+
+class AddChangesUsers(BotSettings):
+
+    def __init__(self, user_id: int):
+        self.user_id = user_id
+
+    def run(self):
+        collections = get_collections()
+        res = collections.find_one({"_id": 0})
+        if res is None:
+            collections.insert_one({"_id": 0, "activity": True, "distribute_chat_ids": [], "lock": False,
+                                    "changes_users_ids": [self.user_id]})
+        else:
+            collections.update_one(
+                {"_id": 0},
+                {"$addToSet": {"changes_users_ids": self.user_id}}
+            )
+
+
+class RemoveChangesUsers(BotSettings):
+    def __init__(self, user_id: int):
+        self.user_id = user_id
+
+    def run(self):
+        collections = get_collections()
+        res = collections.find_one({"_id": 0})
+        if res is None:
+            print("Запись не найдена")
+        else:
+            collections.update_one(
+                {"_id": 0},
+                {"$pull": {"changes_users_ids": self.user_id}}
+            )
+            print(f"user_id {self.user_id} был удален из distribute_chat_ids")
 
 
 def update_bot_settings(bot_settings: BotSettings):

@@ -8,7 +8,7 @@ from apscheduler.triggers.cron import CronTrigger
 from dotenv import load_dotenv
 
 from bot.routers import start_router, rules_router, bot_settings_handler, monitor_handler, sharovar_handler, \
-    gpt_mode_handler
+    gpt_mode_handler, change_router
 from sceduler.sceduler import scheduler
 from sceduler.task import DistributedTask, RefreshFineTask
 
@@ -23,8 +23,11 @@ routers = [
     bot_settings_handler.router,
     sharovar_handler.router,
     gpt_mode_handler.router,
+    change_router.router,
     monitor_handler.router,
 ]
+
+
 def job_error_listener(event):
     if event.exception:
         logging.error(f"Ошибка в задаче: {event.job_id}", exc_info=event.exception)
