@@ -70,6 +70,40 @@ class VideoRoundRecognize(Recognize):
         return audio_path, video_path
 
 
+class SegmentedVoiceRecognize(VoiceRecognize):
+
+    async def recognize(self) -> list[str]:
+        file_id = self.get_file_id()
+        file = await self.message.bot.get_file(file_id)
+        file_path = file.file_path
+        audio_path, another_path = await self.get_path(file_path, file_id)
+
+        try:
+            segments = self.split_audio(audio_path, chunk_length_ms=45000)  # Разделяем аудио на части по 45 секунд
+            texts = []
+            for segment in segments:
+                segment.export("temp_segment.wav", format="wav")  # Сохраняем временный сегмент
+                text = recognize_speech("temp_segment.wav")  # Распознаем сегмент
+                texts.append(text)
+                os.remove("temp_segment.wav")  # Удаляем временный файл после обработки
+        finally:
+            os.remove(audio_path)
+            os.remove(another_path)
+
+        return texts
+
+    def split_audio(self, audio_path: str, chunk_length_ms: int) -> list[AudioSegment]:
+        """
+        Разделить аудио на части по указанной длине.
+        :param audio_path: путь к аудиофайлу
+        :param chunk_length_ms: длина одного сегмента в миллисекундах
+        :return: список аудиосегментов
+        """
+        audio = AudioSegment.from_file(audio_path)
+        chunks = [audio[start:start + chunk_length_ms] for start in range(0, len(audio), chunk_length_ms)]
+        return chunks
+
+
 recognize_type = {
     ContentType.VOICE: VoiceRecognize,
     ContentType.VIDEO_NOTE: VideoRoundRecognize,

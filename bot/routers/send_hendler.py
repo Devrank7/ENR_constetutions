@@ -5,6 +5,7 @@ from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message
 
+from bot.api.helper.recognize import SegmentedVoiceRecognize
 from bot.api.helper.text import text_from_message
 from bot.to import get_history, ToChat
 
@@ -46,12 +47,15 @@ async def send_reco(message: Message):
     if not reply_message:
         await message.answer('Закрипите сообщение')
         return
-    text = await text_from_message(reply_message)
-    dil = words_dilimeters(text)
-    for i, di in enumerate(dil):
-        try:
-            last_index = dil[i + 1]
-        except IndexError:
-            break
-        t = text[dil[i]:last_index]
-        await message.answer(t)
+    texts = await SegmentedVoiceRecognize(message).recognize()
+    for text in texts:
+        await message.answer(text)
+    # text = await text_from_message(reply_message)
+    # dil = words_dilimeters(text)
+    # for i, di in enumerate(dil):
+    #     try:
+    #         last_index = dil[i + 1]
+    #     except IndexError:
+    #         break
+    #     t = text[dil[i]:last_index]
+    #     await message.answer(t)
