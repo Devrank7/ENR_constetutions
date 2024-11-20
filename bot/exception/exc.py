@@ -9,3 +9,11 @@ class ENRConstitutionsException(Exception):
         super().__init__(*args)
         self.message = message
         self.cost = cost
+
+
+class ArgsException(Exception):
+    pass
+
+
+class NoChatException(Exception):
+    pass

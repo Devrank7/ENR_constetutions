@@ -8,7 +8,7 @@ from apscheduler.triggers.cron import CronTrigger
 from dotenv import load_dotenv
 
 from bot.routers import start_router, rules_router, bot_settings_handler, monitor_handler, sharovar_handler, \
-    gpt_mode_handler, change_router
+    gpt_mode_handler, change_router, ebenya_router, send_hendler
 from sceduler.sceduler import scheduler
 from sceduler.task import DistributedTask, RefreshFineTask
 
@@ -24,6 +24,8 @@ routers = [
     sharovar_handler.router,
     gpt_mode_handler.router,
     change_router.router,
+    ebenya_router.router,
+    send_hendler.router,
     monitor_handler.router,
 ]
 
