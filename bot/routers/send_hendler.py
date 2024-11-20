@@ -46,7 +46,7 @@ async def send_reco(message: Message):
     if not reply_message:
         await message.answer('Закрипите сообщение')
         return
-    text = await text_from_message(message)
+    text = await text_from_message(reply_message)
     dil = words_dilimeters(text)
     for i, di in enumerate(dil):
         try:
