@@ -47,7 +47,7 @@ async def send_reco(message: Message):
     if not reply_message:
         await message.answer('Закрипите сообщение')
         return
-    texts = await SegmentedVoiceRecognize(message).recognize()
+    texts = await SegmentedVoiceRecognize(reply_message).recognize()
     for text in texts:
         await message.answer(text)
     # text = await text_from_message(reply_message)
