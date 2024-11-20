@@ -12,6 +12,7 @@ async def get_history(bot: Bot, chat_id: int, limit: int = 100) -> list[Message]
     messages = []
     try:
         updates = await bot.get_updates(limit=limit)
+        print("Updates: ", updates)
         for update in updates:
             if update.message and update.message.chat.id == chat_id:
                 messages.append(update.message)

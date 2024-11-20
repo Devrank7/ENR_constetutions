@@ -35,7 +35,7 @@ def words_dilimeters(text: str) -> list[int]:
     length = float(len(text) / 4000)
     to_int = int(length)
     remainder = length - to_int
-    dilimiters = [(4000 * d) for d in range(to_int)]
+    dilimiters = [(4000 * d) for d in range(to_int + 1)]
     dilimiters.append((dilimiters[-1] + int(4000 * remainder)))
     return dilimiters
 
