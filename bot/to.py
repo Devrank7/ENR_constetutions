@@ -15,6 +15,7 @@ async def get_history(bot: Bot, chat_id: int, limit: int = 100) -> list[Message]
         for update in updates:
             if update.message and update.message.chat.id == chat_id:
                 messages.append(update.message)
+        return messages
     except TelegramAPIError as e:
         print(f"Ошибка API Telegram: {e}")
         return []
