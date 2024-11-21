@@ -1,3 +1,5 @@
+from html import escape
+
 from aiogram import Router
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
@@ -123,14 +125,16 @@ async def get_chat_history(message: Message, state: FSMContext):
             await message.answer("Сообщений в этом чате пока нет.")
             return
         history = "\n\n".join(
-            [f"📩 <b>От:</b> {msg.sender_id}\n<b>Сообщение:</b> {msg.id}\n<b>Текст:</b> {msg.text}" for msg in messages
+            [f"📩 <b>От:</b> {msg.sender_id}\n<b>Сообщение:</b> {msg.id}\n<b>Текст:</b> {escape(msg.text)}" for msg in
+             messages
              if msg.text]
         )
         if len(history) > 4096:
-            history = history[:4093] + "..."
+            allowed_length = 4060  # С учётом возможного добавления "..."
+            while len(history) > allowed_length:
+                history = history.rsplit('\n\n', 1)[0]  # Удаляем последние сообщения, чтобы не разорвать структуру
+                history += "..."
         await message.answer(f"<b>Последние 100 сообщений:</b>\n\n{history}", parse_mode="HTML")
-    except Exception as e:
-        await message.answer(f"Произошла ошибка: {e}")
     finally:
         await telethon_client.disconnect()
         await state.clear()

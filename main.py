@@ -57,7 +57,6 @@ async def main():
     scheduler.add_job(holiday_summer.execute, CronTrigger(month='5', day='31'))
     scheduler.add_listener(job_error_listener, EVENT_JOB_ERROR)
     scheduler.start()
-    await bot.delete_webhook()
     await dp.start_polling(bot)
 
 
