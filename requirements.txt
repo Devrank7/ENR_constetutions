@@ -60,3 +60,5 @@ tzlocal==5.2
 urllib3==2.2.3
 uvicorn==0.32.0
 yarl==1.17.1
+
+Telethon~=1.38.1

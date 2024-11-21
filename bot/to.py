@@ -6,20 +6,18 @@ from aiogram.types import Message
 
 from bot.exception.exc import ArgsException, NoChatException
 from bot.util.util import to_json
+from telethon.tl.types import Message as TelethonMessage
 
 
-async def get_history(bot: Bot, chat_id: int, limit: int = 100) -> list[Message]:
-    messages = []
-    try:
-        updates = await bot.get_updates(limit=limit)
-        print("Updates: ", updates)
-        for update in updates:
-            if update.message and update.message.chat.id == chat_id:
-                messages.append(update.message)
-        return messages
-    except TelegramAPIError as e:
-        print(f"Ошибка API Telegram: {e}")
-        return []
+class MessageInfo:
+    def __init__(self, date, message_id, text):
+        self.date = date
+        self.message_id = message_id
+        self.text = text
+
+
+async def get_history(bot: Bot, chat_id: int, limit: int = 100) -> list[MessageInfo]:
+    return []
 
 
 class To(ABC):

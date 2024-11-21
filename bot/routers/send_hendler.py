@@ -6,13 +6,12 @@ from aiogram.filters import Command
 from aiogram.types import Message
 
 from bot.api.helper.recognize import SegmentedVoiceRecognize
-from bot.api.helper.text import text_from_message
 from bot.to import get_history, ToChat
 
 router = Router()
 
 
-@router.message(Command('history'))
+@router.message(Command('his'))
 async def send_history(message: Message):
     chat_id = message.text.split(' ')[1]
     messages = await get_history(bot=message.bot, chat_id=int(chat_id))
@@ -50,12 +49,3 @@ async def send_reco(message: Message):
     texts = await SegmentedVoiceRecognize(reply_message).recognize()
     for text in texts:
         await message.answer(text)
-    # text = await text_from_message(reply_message)
-    # dil = words_dilimeters(text)
-    # for i, di in enumerate(dil):
-    #     try:
-    #         last_index = dil[i + 1]
-    #     except IndexError:
-    #         break
-    #     t = text[dil[i]:last_index]
-    #     await message.answer(t)
