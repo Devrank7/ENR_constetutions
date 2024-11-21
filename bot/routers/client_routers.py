@@ -130,9 +130,9 @@ async def get_chat_history(message: Message, state: FSMContext):
              if msg.text]
         )
         if len(history) > 4096:
-            allowed_length = 4060  # С учётом возможного добавления "..."
+            allowed_length = 4060
             while len(history) > allowed_length:
-                history = history.rsplit('\n\n', 1)[0]  # Удаляем последние сообщения, чтобы не разорвать структуру
+                history = history.rsplit('\n\n', 1)[0]
                 history += "..."
         await message.answer(f"<b>Последние 100 сообщений:</b>\n\n{history}", parse_mode="HTML")
     finally:

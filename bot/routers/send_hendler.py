@@ -6,7 +6,7 @@ from aiogram.filters import Command
 from aiogram.types import Message
 
 from bot.api.helper.recognize import SegmentedVoiceRecognize
-from bot.to import get_history, ToChat
+from bot.to import get_history, ToChat, ToChatUnban
 
 router = Router()
 
@@ -20,15 +20,31 @@ async def send_history(message: Message):
     await message.answer(json_str)
 
 
-@router.message(Command("to"))
-async def send_hendler(message: Message):
+send_types = {
+    "/to": ToChat,
+    "/un": ToChatUnban
+}
+
+
+async def send(message: Message):
     try:
         json_loader = message.reply_to_message.text
-        await ToChat(message, json_loader).send()
+        command = message.text[:3]
+        await send_types.get(command)(message, json_loader, message.bot).send()
         await message.answer("Я отслал сообщение в другой чат!!!")
     except Exception as e:
         traceback.print_exc()
         await message.answer("Какая то ошибочка. {}".format(e))
+
+
+@router.message(Command("to"))
+async def send_hendler(message: Message):
+    await send(message)
+
+
+@router.message(Command("un"))
+async def send_unban(message: Message):
+    await send(message)
 
 
 def words_dilimeters(text: str) -> list[int]:
