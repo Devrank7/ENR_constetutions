@@ -17,3 +17,7 @@ class ArgsException(Exception):
 
 class NoChatException(Exception):
     pass
+
+
+class NoClientAuthorizedException(Exception):
+    pass

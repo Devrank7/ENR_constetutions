@@ -62,3 +62,4 @@ uvicorn==0.32.0
 yarl==1.17.1
 
 Telethon~=1.38.1
+pytesseract~=0.3.13

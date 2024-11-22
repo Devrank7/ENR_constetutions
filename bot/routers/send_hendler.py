@@ -6,7 +6,7 @@ from aiogram.filters import Command
 from aiogram.types import Message
 
 from bot.api.helper.recognize import SegmentedVoiceRecognize
-from bot.to import get_history, ToChat, ToChatUnban
+from bot.to import get_history, ToChat, ToChatUnban, ToAddUserAfterInsertTextAndAfterDeleteUserFromChat
 
 router = Router()
 
@@ -22,7 +22,8 @@ async def send_history(message: Message):
 
 send_types = {
     "/to": ToChat,
-    "/un": ToChatUnban
+    "/un": ToChatUnban,
+    "/do": ToAddUserAfterInsertTextAndAfterDeleteUserFromChat
 }
 
 
@@ -30,7 +31,7 @@ async def send(message: Message):
     try:
         json_loader = message.reply_to_message.text
         command = message.text[:3]
-        await send_types.get(command)(message, json_loader, message.bot).send()
+        await send_types.get(command)(message, json_loader).send()
         await message.answer("Я отслал сообщение в другой чат!!!")
     except Exception as e:
         traceback.print_exc()
@@ -44,6 +45,11 @@ async def send_hendler(message: Message):
 
 @router.message(Command("un"))
 async def send_unban(message: Message):
+    await send(message)
+
+
+@router.message(Command("down"))
+async def send_down(message: Message):
     await send(message)
 
 
