@@ -103,10 +103,10 @@ class SegmentedVoiceRecognize(VoiceRecognize):
 class PhotoRecognize(Recognize):
 
     async def recognize(self) -> str:
-        photo = self.message.photo[-1]
-        file_info = await self.message.bot.get_file(photo.file_id)
+        file_id = self.get_file_id()
+        file_info = await self.message.bot.get_file(file_id)
         file_path = file_info.file_path
-        photo_file = f"downloads/{photo.file_id}.jpg"  # Локальный путь для сохранения
+        photo_file = f"downloads/{file_id}.jpg"
         await self.message.bot.download_file(file_path, photo_file)
         try:
             image = Image.open(photo_file)
@@ -119,7 +119,8 @@ class PhotoRecognize(Recognize):
             return "Not"
 
     def get_file_id(self) -> str:
-        pass
+        photo = self.message.photo[-1]
+        return photo.file_id
 
     async def get_path(self, file_path: str, file_id: str) -> tuple[str, str]:
         pass
