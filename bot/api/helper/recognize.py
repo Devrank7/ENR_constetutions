@@ -116,7 +116,7 @@ class PhotoRecognize(Recognize):
             return extracted_text
         except Exception as e:
             print("Exc: ", e)
-            return "No"
+            return "Not"
 
     def get_file_id(self) -> str:
         pass
