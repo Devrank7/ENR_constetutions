@@ -1,6 +1,8 @@
 import os
 from abc import ABC, abstractmethod
 
+import pytesseract
+from PIL import Image
 from aiogram import Bot
 from aiogram.enums import ContentType
 from aiogram.types import Message
@@ -93,18 +95,38 @@ class SegmentedVoiceRecognize(VoiceRecognize):
         return texts
 
     def split_audio(self, audio_path: str, chunk_length_ms: int) -> list[AudioSegment]:
-        """
-        Разделить аудио на части по указанной длине.
-        :param audio_path: путь к аудиофайлу
-        :param chunk_length_ms: длина одного сегмента в миллисекундах
-        :return: список аудиосегментов
-        """
         audio = AudioSegment.from_file(audio_path)
         chunks = [audio[start:start + chunk_length_ms] for start in range(0, len(audio), chunk_length_ms)]
         return chunks
 
 
+class PhotoRecognize(Recognize):
+
+    async def recognize(self) -> str:
+        photo = self.message.photo[-1]
+        file_info = await self.message.bot.get_file(photo.file_id)
+        file_path = file_info.file_path
+        photo_file = f"downloads/{photo.file_id}.jpg"  # Локальный путь для сохранения
+        await self.message.bot.download_file(file_path, photo_file)
+        try:
+            image = Image.open(photo_file)
+            extracted_text = pytesseract.image_to_string(image, lang="rus")
+            print("extract: ", extracted_text)
+            os.remove(file_path)
+            return extracted_text
+        except Exception as e:
+            print("Exc: ", e)
+            return "No"
+
+    def get_file_id(self) -> str:
+        pass
+
+    async def get_path(self, file_path: str, file_id: str) -> tuple[str, str]:
+        pass
+
+
 recognize_type = {
     ContentType.VOICE: VoiceRecognize,
     ContentType.VIDEO_NOTE: VideoRoundRecognize,
+    ContentType.PHOTO: PhotoRecognize,
 }

@@ -9,4 +9,4 @@ class ENRMessage(Filter):
 
     async def __call__(self, message: Message) -> bool:
         print("FILTER")
-        return message.content_type in [ContentType.TEXT, ContentType.VOICE, ContentType.VIDEO_NOTE]
+        return message.content_type in [ContentType.PHOTO, ContentType.TEXT, ContentType.VOICE, ContentType.VIDEO_NOTE]
